@@ -22,3 +22,7 @@ I hope this code can help people trying to reproduce experiments in the paper.
 
 The pydestruct directory contains a lot of code unrelated with this parser, it is a collection of python file I use.
 Note all code in this directory was written by myself, I tried to put link to other repos whenever I stolled it.
+
+## WARNING
+
+The inside-outside implementation **does not work**.
