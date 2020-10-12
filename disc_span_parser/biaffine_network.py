@@ -8,7 +8,7 @@ from pydestruct.nn.bilstm import BiLSTM
 from pydestruct.nn.dropout import SharedDropout
 from pydestruct.nn.dependency import BatchedBiaffine
 from pydestruct.dict import Dict
-import pydestruct.nn.transformer_klein as transformer_klein
+#import pydestruct.nn.transformer_klein as transformer_klein
 
 class BiaffineParserNetwork(nn.Module):
     def __init__(self, args, n_cont_labels, n_disc_labels, n_tags=-1, default_lstm_init=False, old=False,**arg_dict):

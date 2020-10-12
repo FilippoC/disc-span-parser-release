@@ -5,9 +5,9 @@ import numpy as np
 
 from pydestruct.nn.bert import Bert
 from pydestruct.nn.characters import CharacterEncoder
-from pydestruct.nn.transformer import Transformer
+#from pydestruct.nn.transformer import Transformer
 from pydestruct.nn.bilstm import BiLSTM
-from pydestruct.nn.dependency import DependencyModule
+#from pydestruct.nn.dependency import DependencyModule
 import pydestruct.nn.dropout
 
 def get_elmo():

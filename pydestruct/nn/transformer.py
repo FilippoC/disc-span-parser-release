@@ -3,7 +3,7 @@ import torch.nn.init
 import torch.nn.functional as F
 from pydestruct.nn.dropout import SharedDropout, IndependentDropout
 
-import pydestruct.nn.transformer_klein
+#import pydestruct.nn.transformer_klein
 
 class LayerNorm(nn.Module):
     def __init__(self, dim, mean=0., std=1., fixed=False, eps=1e-6, ball=False):
