@@ -29,6 +29,73 @@ The pydestruct directory contains a lot of code unrelated with this parser, it i
 Not all code in this directory was written by myself, I tried to put link to other repos whenever I stolled it.
 
 
-## WARNING
+
+# Example
+
+train_disc_biaffine.py
+--model model
+--dev dev.export
+--train train.export
+--max-word-len 20
+--epochs 200
+--batch-clusters 32
+--batch 5000
+--storage-device cpu
+--device gpu
+--char-lstm-boundaries
+--mean-loss
+--min-word-freq 2
+--char-embs
+--char-embs-dim 64
+--char-lstm-dim 100
+--word-embs
+--word-embs-dim 300
+--dropout-features 0.3
+--dropout-char-lstm-input 0.3
+--mlp-dropout 0.33
+--biaffine
+--proj-dim 500
+--label-proj-dim 100
+--span-proj-dim 500
+--tagger
+--tagger-stack 1
+--lstm-dim 800
+--lstm-layers 1
+--lstm-stacks 2
+--lstm-dropout 0.3
+--optim adam
+--optim-lr 1e-3
+--optim-lr-scheduler exponential
+--optim-lr-scheduler-step 5000
+--optim-lr-scheduler-decay 0.75
+
+
+# other options
+
+To use pretrain word embeddings:  
+--pretrained-word-embs
+--pretrained-word-embs-finetune
+--pretrained-word-embs-path PARH
+--pretrained-word-embs-dim 300
+
+
+To use Bert (you should probably remove --char-embs option if you use Bert):  
+--bert
+--bert-tokenizer BERT_TOKENIZER
+--bert-model BERT_MODEL
+--bert-start-features
+--bert-cache BERT_CACHE_PATH
+--bert-mix-layers 4-7
+
+
+If its a lower case Bert model:  
+--bert-do-lower-case
+
+
+If its an english Bert:  
+--bert-split-nt
+
+
+# WARNING
 
 The inside-outside implementation **does not work**.
