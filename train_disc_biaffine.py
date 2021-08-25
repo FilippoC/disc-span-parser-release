@@ -14,7 +14,8 @@ import pydestruct.nn.bert
 import pydestruct.logger
 from pydestruct.optim import MetaOptimizer
 from pydestruct.batch import batch_iterator_factory
-from disc_span_parser.biaffine_loss import CorrectedBatchUnstructuredProbLoss, BatchUnstructuredApproximateProbLoss, MarginLoss, BatchUnstructuredCorrectProbLoss
+#from disc_span_parser.biaffine_loss import CorrectedBatchUnstructuredProbLoss, BatchUnstructuredApproximateProbLoss, MarginLoss, BatchUnstructuredCorrectProbLoss
+from disc_span_parser.biaffine_loss import BatchUnstructuredApproximateProbLoss
 import pydestruct.eval
 import disc_span_parser.biaffine_eval
 
@@ -41,16 +42,16 @@ cmd.add_argument('--tensorboard', type=str, default="", help="Tensorboard path")
 cmd.add_argument('--default-lstm-init', action="store_true", help="")
 cmd.add_argument('--pipeline', action="store_true", help="")
 cmd.add_argument("--mean-loss", action="store_true")
-cmd.add_argument("--nll-loss", action="store_true")
-cmd.add_argument("--margin-loss", action="store_true")
+#cmd.add_argument("--nll-loss", action="store_true")
+#cmd.add_argument("--margin-loss", action="store_true")
 cmd.add_argument("--complexity", type=int, default=5)
 cmd.add_argument("--ill-nested", action="store_true")
 BiaffineParserNetwork.add_cmd_options(cmd)
 MetaOptimizer.add_cmd_options(cmd)
 args = cmd.parse_args()
 
-if args.nll_loss and args.margin_loss:
-    raise RuntimeError("You can only choose one loss")
+#if args.nll_loss and args.margin_loss:
+#    raise RuntimeError("You can only choose one loss")
 
 if len(args.tensorboard) > 0:
     print_log("Tensorboard logging: %s" % args.tensorboard)
@@ -173,7 +174,8 @@ optimizer = MetaOptimizer(
 
 # load library
 # -2 because we remove BOS and EOS
-max_sentence_size = max(len(sentence["words"]) for sentence in dev_data + test_data + (train_data if args.margin_loss else []))
+#max_sentence_size = max(len(sentence["words"]) for sentence in dev_data + test_data + (train_data if args.margin_loss else []))
+max_sentence_size = max(len(sentence["words"]) for sentence in dev_data + test_data)
 print_log("Loading cpp lib with max sent size: %i" % max_sentence_size)
 disc_span_parser.load_cpp_lib(
     max_sentence_size,
@@ -194,13 +196,15 @@ print_log(
 timers = pydestruct.timer.Timers()
 timers.total.reset(restart=True)
 
-if args.nll_loss:
-    #loss_builder = BatchUnstructuredApproximateProbLoss(joint=not args.pipeline, reduction="mean" if args.mean_loss else "sum")
-    loss_builder = BatchUnstructuredCorrectProbLoss(joint=not args.pipeline, reduction="mean" if args.mean_loss else "sum")
-elif args.margin_loss:
-    loss_builder = MarginLoss(complexity=args.complexity, ill_nested=args.ill_nested, reduction="mean" if args.mean_loss else "sum")
-else:
-    loss_builder = CorrectedBatchUnstructuredProbLoss(joint=not args.pipeline, reduction="mean" if args.mean_loss else "sum")
+loss_builder = BatchUnstructuredApproximateProbLoss(joint=not args.pipeline, reduction="mean" if args.mean_loss else "sum")
+#if args.nll_loss:
+#    #loss_builder = BatchUnstructuredApproximateProbLoss(joint=not args.pipeline, reduction="mean" if args.mean_loss else "sum")
+#    loss_builder = BatchUnstructuredCorrectProbLoss(joint=not args.pipeline, reduction="mean" if args.mean_loss else "sum")
+#elif args.margin_loss:
+#    loss_builder = MarginLoss(complexity=args.complexity, ill_nested=args.ill_nested, reduction="mean" if args.mean_loss else "sum")
+#else:
+#    loss_builder = CorrectedBatchUnstructuredProbLoss(joint=not args.pipeline, reduction="mean" if args.mean_loss else "sum")
+
 tag_loss_builder = nn.CrossEntropyLoss(reduction="mean" if args.mean_loss else "sum")
 for epoch in range(args.epochs):
     network.train()

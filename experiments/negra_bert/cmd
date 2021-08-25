@@ -1,0 +1,175 @@
+#!/bin/bash
+#SBATCH --job-name=negra_bert
+#SBATCH --output=out2
+#SBATCH --error=err2
+#SBATCH --gres=gpu:1
+#SBATCH --time=2-00:00:00
+#SBATCH --ntasks=1
+#SBATCH --exclude=n[1-5]
+#SBATCH --mem 90GO
+
+export PYTHONPATH=../../;$PYTHONPATH
+
+python \
+	../../train_disc_biaffine.py \
+	--train ../../data/negra/train.export \
+	--dev ../../data/negra/dev.export \
+	--word-embs \
+	--bert \
+	--bert-model bert-base-german-cased \
+	--bert-tokenizer bert-base-german-cased \
+	--min-word-freq 10 \
+	--word-embs-dim 300 \
+	--char-embs-dim 64 \
+	--char-lstm-dim 100 \
+	--max-word-len 20 \
+	--model model \
+	--device cuda:0 \
+	--epochs 200 \
+	--batch 5000 \
+	--batch-clusters 32 \
+	--optim adam \
+	--optim-adam-b1 0.9 \
+	--optim-adam-b2 0.9 \
+	--optim-adam-eps 1e-12 \
+	--optim-lr 1e-3 \
+	--optim-lr-scheduler exponential \
+	--optim-lr-scheduler-step 5000 \
+	--optim-lr-scheduler-decay 0.75 \
+	--char-lstm-boundaries \
+	--lstm-stacks 2 \
+	--lstm-layers 1 \
+	--bert-start-features \
+	--bert-split-nt \
+	--bert-cache /mnt/beegfs/home/corro/parsiti/caio/transformers-cache \
+	--dropout-features 0.3 \
+	--dropout-char-lstm-input 0.3 \
+	--mlp-dropout 0.33 \
+	--lstm-dropout 0.3 \
+	--lstm-dim 800 \
+	--label-proj-dim 500 \
+	--span-proj-dim 100 \
+	--mean-loss
+
+# cubic
+python \
+	../../pred_disc_biaffine.py \
+	--data ../../data/negra/test.export \
+	--model model \
+	--device cuda:0 \
+	--cubic \
+	> test.predicted_n3.export
+
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n3.export \
+	../../proper.prm \
+	> n3_scores_all.txt
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n3.export \
+	../../proper.prm \
+	--disconly \
+	> n3_scores_disc.txt
+
+# n4, should be the same result as above
+python \
+	../../pred_disc_biaffine.py \
+	--data ../../data/negra/test.export \
+	--model model \
+	--device cuda:0 \
+	--complexity 4 \
+	> test.predicted_n4.export
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n4.export \
+	../../proper.prm \
+	> n4_scores_all.txt
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n4.export \
+	../../proper.prm \
+	--disconly \
+	> n4_scores_disc.txt
+
+# n5 well nested
+python \
+	../../pred_disc_biaffine.py \
+	--data ../../data/negra/test.export \
+	--model model \
+	--device cuda:0 \
+	--complexity 5 \
+	--wellnested \
+	> test.predicted_n5_wn.export
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n5_wn.export \
+	../../proper.prm \
+	> n5_wn_scores_all.txt
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n5_wn.export \
+	../../proper.prm \
+	--disconly \
+	> n5_wn_scores_disc.txt
+
+# n5 ill nested
+python \
+	../../pred_disc_biaffine.py \
+	--data ../../data/negra/test.export \
+	--model model \
+	--device cuda:0 \
+	--complexity 5 \
+	> test.predicted_n5_in.export
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n5_in.export \
+	../../proper.prm \
+	> n5_in_scores_all.txt
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n5_in.export \
+	../../proper.prm \
+	--disconly \
+	> n5_in_scores_disc.txt
+
+# n6 well nested
+python \
+	../../pred_disc_biaffine.py \
+	--data ../../data/negra/test.export \
+	--model model \
+	--device cuda:0 \
+	--complexity 6 \
+	--wellnested \
+	> test.predicted_n6_wn.export
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n6_wn.export \
+	../../proper.prm \
+	> n6_wn_scores_all.txt
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n6_wn.export \
+	../../proper.prm \
+	--disconly \
+	> n6_wn_scores_disc.txt
+
+# n6 ill nested
+python \
+	../../pred_disc_biaffine.py \
+	--data ../../data/negra/test.export \
+	--model model \
+	--device cuda:0 \
+	--complexity 6 \
+	> test.predicted_n6_in.export
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n6_in.export \
+	../../proper.prm \
+	> n6_in_scores_all.txt
+discodop eval \
+	../../data/negra/test.export \
+	test.predicted_n6_in.export \
+	../../proper.prm \
+	--disconly \
+	> n6_in_scores_disc.txt

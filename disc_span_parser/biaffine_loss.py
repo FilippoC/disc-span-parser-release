@@ -4,7 +4,7 @@ import numpy as np
 import sys
 import disc_span_parser
 
-
+"""
 class MarginLoss(nn.Module):
     def __init__(self, complexity, ill_nested, reduction="mean"):
         super(MarginLoss, self).__init__()
@@ -124,8 +124,9 @@ class CorrectedBatchUnstructuredProbLoss(nn.Module):
             return sum(loss)
         else:
             raise NotImplementedError()
+"""
 
-
+# this is the "correct" loss
 class BatchUnstructuredApproximateProbLoss(nn.Module):
     def __init__(self, joint=True, reduction="mean"):
         super(BatchUnstructuredApproximateProbLoss, self).__init__()
@@ -203,9 +204,12 @@ class BatchUnstructuredApproximateProbLoss(nn.Module):
 
                 loss.append(self.builder(label_weights[k][mask], gold_label_indices[mask]))
 
+            # maybe it should be this?
+            # return sum(loss)
             return sum(l.sum() for l in loss)
 
-
+# why is this one wrong?
+"""
 class BatchUnstructuredCorrectProbLoss(nn.Module):
     def __init__(self, joint=True, reduction="mean"):
         super(BatchUnstructuredCorrectProbLoss, self).__init__()
@@ -273,3 +277,4 @@ class BatchUnstructuredCorrectProbLoss(nn.Module):
                 gold_indices = gold_indices[id_x, id_y]
                 loss.append(self.builder(sentence_weights, gold_indices))
         return sum(loss)
+"""

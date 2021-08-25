@@ -10,90 +10,43 @@ python3 setup.py install --user
 
 
 There is one script for training and one for prediction.  
-Unfortunately, due to covid conditions I am really busy with my courses these days so I don't have time to check the exact cmd line to train the same model as in the paper (see the appendix for hyperparameters).  
-In config.py you will find arguments used to train several variants (this is a configurations used in another software, but it contains most stuff useful).  
-Don't forget to use -max-word-len 20 to speed training/prediction time.
-
-
-Training loss:  
-There are several training loss implemented and I can't remember which was the one use in the experiments in the paper (definitely not the margin loss).  
-In train_disc_biaffine.py the line 199 is commented, I don't know why.  
-I think the correct way to train the parser is only with --mean-loss and **without** --nll-loss or --margin-loss.
-
-
-I apologize for this mess, I will correct this as soon as I have more free time.  
-I hope this code can help people trying to reproduce experiments in the paper.
-
 
 The pydestruct directory contains a lot of code unrelated with this parser, it is a collection of python file I use.  
 Not all code in this directory was written by myself, I tried to put link to other repos whenever I stolled it.
+The file proper.prm is the file distributed with discodop.
 
+# Reproduce experiments
 
+You need to install to following software/libraries:
 
-# Example
+- Python 3
+- Discodop (the discodop command line tool must be in the path - it is used for evaluation)
+- Pytorch
+- the Huggingface transformers library (I use version 3.0.1, I am not sure it will work with newer versions)
 
-train_disc_biaffine.py
---model model
---dev dev.export
---train train.export
---max-word-len 20
---epochs 200
---batch-clusters 32
---batch 5000
---storage-device cpu
---device gpu
---char-lstm-boundaries
---mean-loss
---min-word-freq 2
---char-embs
---char-embs-dim 64
---char-lstm-dim 100
---word-embs
---word-embs-dim 300
---dropout-features 0.3
---dropout-char-lstm-input 0.3
---mlp-dropout 0.33
---biaffine
---proj-dim 500
---label-proj-dim 100
---span-proj-dim 500
---tagger
---tagger-stack 1
---lstm-dim 800
---lstm-layers 1
---lstm-stacks 2
---lstm-dropout 0.3
---optim adam
---optim-lr 1e-3
---optim-lr-scheduler exponential
---optim-lr-scheduler-step 5000
---optim-lr-scheduler-decay 0.75
+Download glove embeddings (dim=300) and put them in an embeddings directory with name glove_english.txt and glove_german.txt.
+Next, put the proprocessed data in the data directory, as follows:
 
+$ tree data  
+data  
+├── dptb  
+│   ├── dev.export  
+│   ├── test.export  
+│   └── train.export  
+├── negra  
+│   ├── dev.export  
+│   ├── test.export  
+│   ├── train.export  
+└── tiger_spmrl 
+    ├── dev.export  
+    ├── test.export  
+    └── train.export  
 
-# other options
-
-To use pretrain word embeddings:  
---pretrained-word-embs
---pretrained-word-embs-finetune
---pretrained-word-embs-path PARH
---pretrained-word-embs-dim 300
-
-
-To use Bert (you should probably remove --char-embs option if you use Bert):  
---bert
---bert-tokenizer BERT_TOKENIZER
---bert-model BERT_MODEL
---bert-start-features
---bert-cache BERT_CACHE_PATH
---bert-mix-layers 4-7
-
-
-If its a lower case Bert model:  
---bert-do-lower-case
-
-
-If its an english Bert:  
---bert-split-nt
+The experiments directory contains scripts called cmd that you can execute to train and evaluate models in different settings.
+If you use slurm you can execute display_results.sh that will submit all cmd scripts via sbatch.
+After training is done, you can use display_results.sh to have a summary of results on test data.
+I use nvidia V100 GPUs with 32GO of ram.
+You will need a lot of CPU ram too (90 Go I think).
 
 
 # WARNING
