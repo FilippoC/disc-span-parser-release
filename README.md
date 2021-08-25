@@ -27,6 +27,7 @@ You need to install to following software/libraries:
 Download glove embeddings (dim=300) and put them in an embeddings directory with name glove_english.txt and glove_german.txt.
 Next, put the proprocessed data in the data directory, as follows:
 
+```
 $ tree data  
 data  
 ├── dptb  
@@ -41,6 +42,7 @@ data
     ├── dev.export  
     ├── test.export  
     └── train.export  
+```
 
 The experiments directory contains scripts called cmd that you can execute to train and evaluate models in different settings.
 If you use slurm you can execute display_results.sh that will submit all cmd scripts via sbatch.
